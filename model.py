@@ -346,12 +346,22 @@ class Model(object):
         None.
 
         '''
+        # # define filepath
+        # iteration = f"-{iteration}" if iteration is not None else ''
+        # filepath = os.path.join(self.directory,f"iteration{iteration}","weights")
+        # os.makedirs(filepath,exist_ok=True)
+        # # save internal model weights
+        # self.model.save_weights(filepath=os.path.join(filepath,"weights"))
+
+        # John Version
         # define filepath
         iteration = f"-{iteration}" if iteration is not None else ''
-        filepath = os.path.join(self.directory,f"iteration{iteration}","weights")
-        os.makedirs(filepath,exist_ok=True)
+        # Adiciona a extensão '.weights.h5' ao final do caminho do arquivo
+        filepath = os.path.join(self.directory, f"iteration{iteration}")
+        weights_file = os.path.join(filepath, "weights.weights.h5")
+        os.makedirs(filepath, exist_ok=True)
         # save internal model weights
-        self.model.save_weights(filepath=os.path.join(filepath,"weights"))
+        self.model.save_weights(filepath=weights_file)
              
     def set_weights(self,weights=None):
         '''
@@ -422,13 +432,13 @@ class Model(object):
         
     def dataset2vecmodel(self,trainable):
         # input two dataset2vec shape = [None,2], i.e. flattened tabular batch
-        x      = tf.keras.Input(shape=(2),dtype=tf.float32)
+        x      = tf.keras.Input(shape=(2,),dtype=tf.float32)
         # Number of sampled classes from triplets
-        nclasses = tf.keras.Input(shape=(self.batch_size*3),dtype=tf.int32,batch_size=1)
+        nclasses = tf.keras.Input(shape=(self.batch_size*3,),dtype=tf.int32,batch_size=1)
         # Number of sampled features from triplets
-        nfeature = tf.keras.Input(shape=(self.batch_size*3),dtype=tf.int32,batch_size=1)
+        nfeature = tf.keras.Input(shape=(self.batch_size*3,),dtype=tf.int32,batch_size=1)
         # Number of sampled instances from triplets
-        ninstanc = tf.keras.Input(shape=(self.batch_size*3),dtype=tf.int32,batch_size=1)
+        ninstanc = tf.keras.Input(shape=(self.batch_size*3,),dtype=tf.int32,batch_size=1)
         # Encode the predictor target relationship across all instances
         layer    = FunctionF(units = self.units_f,nhidden = self.nhidden_f,nonlinearity = self.nonlinearity_d2v,architecture=self.architecture_f,resblocks=self.resblocks_f,trainable=trainable)(x)
         # Average over instances

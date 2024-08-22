@@ -6,6 +6,12 @@ Created on Fri Mar 12 09:34:17 2021
 @author: hsjomaa
 """
 
+# Remover warnings
+# oneDNN custom operations are on.
+# You may see slightly different numerical results due to floating-point round-off errors from different computation orders.
+# To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 import tensorflow as tf
 import json
@@ -48,13 +54,13 @@ def Dataset2VecModel(configuration):
     batch_size = configuration["batch_size"]
     trainable = False
     # input two dataset2vec shape = [None,2], i.e. flattened tabular batch
-    x      = tf.keras.Input(shape=(2),dtype=tf.float32)
+    x = tf.keras.Input(shape=(2,),dtype=tf.float32)
     # Number of sampled classes from triplets
-    nclasses = tf.keras.Input(shape=(batch_size),dtype=tf.int32,batch_size=1)
+    nclasses = tf.keras.Input(shape=(batch_size,),dtype=tf.int32,batch_size=1)
     # Number of sampled features from triplets
-    nfeature = tf.keras.Input(shape=(batch_size),dtype=tf.int32,batch_size=1)
+    nfeature = tf.keras.Input(shape=(batch_size,),dtype=tf.int32,batch_size=1)
     # Number of sampled instances from triplets
-    ninstanc = tf.keras.Input(shape=(batch_size),dtype=tf.int32,batch_size=1)
+    ninstanc = tf.keras.Input(shape=(batch_size,),dtype=tf.int32,batch_size=1)
     # Encode the predictor target relationship across all instances
     layer    = FunctionF(units = units_f,nhidden = nhidden_f,nonlinearity = nonlinearity_d2v,architecture=architecture_f,resblocks=resblocks_f,trainable=trainable)(x)
     # Average over instances
@@ -82,9 +88,9 @@ datasetmf = []
 batch       = Batch(configuration['batch_size'])
 dataset     = Dataset(args.file,rootdir)
 testsampler = TestSampling(dataset=dataset)
+  
 
-
-    
+  
 model     = Dataset2VecModel(configuration)
 
 model.load_weights(os.path.join(log_dir,"weights"), by_name=False, skip_mismatch=False)

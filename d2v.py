@@ -5,6 +5,14 @@ Created on Fri Nov 20 00:16:56 2020
 
 @author: hsjomaa
 """
+
+# Remover warnings
+# oneDNN custom operations are on.
+# You may see slightly different numerical results due to floating-point round-off errors from different computation orders.
+# To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
 from dataset import Dataset
 from sampling import Batch,Sampling,TestSampling
 import tensorflow as tf
@@ -128,7 +136,7 @@ for epoch in range(epochs):
 model.save_weights(iteration=optimizer.iterations.numpy())   
 import pandas as pd
 metafeatures = pd.DataFrame(data=None)
-splitmf = [];
+splitmf = []
 filesmf = []
 for splits in [("train",nsource),("valid",ntarget),("test",ntest)]:
     for _ in range(splits[1]):
